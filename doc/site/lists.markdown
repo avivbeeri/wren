@@ -105,6 +105,16 @@ The `removeAt` method returns the removed item:
     :::wren
     System.print(letters.removeAt(1)) //> c
 
+You can also remove a specific value, if it is present, using `remove`. It removes
+the first element in the list which equals a given value, and then all the 
+following items are shifted up:
+
+    :::wren
+    var numbers = [1, 2, 3, 4]
+    numbers.remove(3)
+    System.print(numbers) //> [1, 2, 4]
+    
+
 If you want to remove everything from the list, you can clear it:
 
     :::wren
