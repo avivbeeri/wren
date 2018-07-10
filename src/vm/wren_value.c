@@ -352,30 +352,31 @@ Value wrenListRemove(WrenVM* vm, ObjList* list, Value removed)
 
   // Iterate through list and find value
   // If we found it, shift the rest up.
-  for (int i = 0; i < list->elements.count - 1; i++)
+  if (IS_OBJ(removed)) wrenPushRoot(vm, AS_OBJ(removed));
+  for (int i = 0; i < list->elements.count; i++)
   {
     if (found == false && wrenValuesEqual(removed, list->elements.data[i])) {
       found = true;
-      if (IS_OBJ(removed)) wrenPushRoot(vm, AS_OBJ(removed));
     }
-    if (found == true) {
+    if (found == true && i < list->elements.count - 1) {
       list->elements.data[i] = list->elements.data[i + 1];
     }
   }
 
-  // If we have too much excess capacity, shrink it.
-  if (list->elements.capacity / GROW_FACTOR >= list->elements.count)
-  {
-    list->elements.data = (Value*)wrenReallocate(vm, list->elements.data,
-        sizeof(Value) * list->elements.capacity,
-        sizeof(Value) * (list->elements.capacity / GROW_FACTOR));
-    list->elements.capacity /= GROW_FACTOR;
+  if (found) {
+    // If we have too much excess capacity, shrink it.
+    if (list->elements.capacity / GROW_FACTOR >= list->elements.count)
+    {
+      list->elements.data = (Value*)wrenReallocate(vm, list->elements.data,
+          sizeof(Value) * list->elements.capacity,
+          sizeof(Value) * (list->elements.capacity / GROW_FACTOR));
+      list->elements.capacity /= GROW_FACTOR;
+    }
+
+    list->elements.count--;
   }
-
-  if (IS_OBJ(removed)) wrenPopRoot(vm);
-
-  list->elements.count--;
-  return removed;
+  if (found && IS_OBJ(removed)) wrenPopRoot(vm);
+  return found ? removed: NULL_VAL;
 }
 
 ObjMap* wrenNewMap(WrenVM* vm)
