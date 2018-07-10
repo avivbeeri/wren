@@ -13,3 +13,9 @@ for (b in c) {
   }
 }
 System.print(c) // expect: [1, 2, 3, 4, 5]
+
+var d = [1, 2, 3, 4, 5, 6]
+for (n in d) {
+  d.remove(n)
+}
+System.print(d) // expect: []
